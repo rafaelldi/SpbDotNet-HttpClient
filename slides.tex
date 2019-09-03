@@ -1,0 +1,78 @@
+\documentclass{beamer}
+
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+
+\usetheme{Madrid}
+\setbeamertemplate{footline}[page number]
+\setbeamertemplate{navigation symbols}{} 
+\usepackage{graphicx}
+
+\usepackage{xcolor}
+\definecolor{bluekeywords}{rgb}{0,0,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.64,0.08,0.08}
+\definecolor{xmlcomments}{rgb}{0.5,0.5,0.5}
+\definecolor{types}{rgb}{0.17,0.57,0.68}
+
+\usepackage{listings}
+\lstset{language=[Sharp]C, 
+frame=lr, 
+showspaces=false,
+showtabs=false,
+breaklines=true,
+showstringspaces=false,
+breakatwhitespace=true,
+escapeinside={(*@}{@*)},
+morekeywords={partial, var, value, get, set},
+commentstyle=\color{greencomments},
+keywordstyle=\color{bluekeywords},
+stringstyle=\color{redstrings},
+basicstyle=\ttfamily\small
+}
+
+\title{HttpClient} 
+\author{Риваль Абдрахманов} 
+\date{2019} 
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Содержание}
+\tableofcontents
+\end{frame}
+
+\section{HttpClient - основная информация}
+\begin{frame}{HttpClient Class}
+    \begin{itemize}
+        \item Provides a base class for sending HTTP requests and receiving HTTP responses from a resource identified by a URI.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{IDisposable Interface}
+    \begin{itemize}
+        \item Provides a mechanism for releasing unmanaged resources;
+        \item public void Dispose ();
+        \item Конструкция using().
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Disposable HttpClient}
+\begin{lstlisting}
+using(var client = new HttpClient())
+{
+  ...
+}
+\end{lstlisting}
+\end{frame}
+
+\section{HttpClient в .Net Framework}
+\begin{frame}{Проблема socket exhaustion}
+\end{frame}
+
+\end{document}
