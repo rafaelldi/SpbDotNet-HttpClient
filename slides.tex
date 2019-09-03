@@ -3,10 +3,11 @@
 \usepackage[T1,T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+\usepackage{textcomp}
+\usepackage[normalem]{ulem}
 
 \usetheme{Madrid}
-\setbeamertemplate{footline}[page number]
-\setbeamertemplate{navigation symbols}{} 
+
 \usepackage{graphicx}
 
 \usepackage{xcolor}
@@ -33,8 +34,10 @@ basicstyle=\ttfamily\small
 }
 
 \title{HttpClient} 
-\author{Риваль Абдрахманов} 
-\date{2019} 
+\subtitle{прошлое, настоящее, будущее}
+\author{Риваль Абдрахманов}
+\institute[PT]{Positive Technologies} 
+\date{SpbDotNet, 2019}
 
 \begin{document}
 \begin{frame}
@@ -46,18 +49,23 @@ basicstyle=\ttfamily\small
 \tableofcontents
 \end{frame}
 
-\section{HttpClient - основная информация}
+\section{HttpClient - базовая информация}
 \begin{frame}{HttpClient Class}
     \begin{itemize}
-        \item Provides a base class for sending HTTP requests and receiving HTTP responses from a resource identified by a URI.
+        \item <1-> Provides a base class for sending HTTP requests and receiving HTTP responses from a resource identified by a URI;
+        \item <2-> $GetAsync(\ldots)$, $PostAsync(\ldots)$, $SendAsync(\ldots)$ и др.;
+        \item <3-> $HttpClient$ реализует $IDisposable$.
     \end{itemize}
 \end{frame}
 
 \begin{frame}{IDisposable Interface}
     \begin{itemize}
-        \item Provides a mechanism for releasing unmanaged resources;
-        \item public void Dispose ();
-        \item Конструкция using().
+        \item <1-> Provides a mechanism for releasing unmanaged resources;
+        \item <2-> $public\,void\,Dispose()$;
+        \item <3-> Конструкция $using(\ldots)$;
+        \item <4> Диспозиться\,\textrightarrow \,диспозь
+        \item <5-> \sout{Диспозиться\,\textrightarrow \,диспозь}
+        \item <5-> Диспозиться\,\textrightarrow \,внимательней
     \end{itemize}
 \end{frame}
 
@@ -71,8 +79,24 @@ using(var client = new HttpClient())
 \end{lstlisting}
 \end{frame}
 
-\section{HttpClient в .Net Framework}
+\section{Основные проблемы}
 \begin{frame}{Проблема socket exhaustion}
+\end{frame}
+
+\section{Интерфейс IHttpClientFactory}
+\begin{frame}
+\end{frame}
+
+\section{Дополнительные улучшения в .NET Core 2.1}
+\begin{frame}
+\end{frame}
+
+\section{HttpRequestMessage и HttpResponseMessage}
+\begin{frame}
+\end{frame}
+
+\section{Новое в .NET Core 3.0}
+\begin{frame}
 \end{frame}
 
 \end{document}
