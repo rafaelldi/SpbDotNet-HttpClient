@@ -1,12 +1,19 @@
-﻿using System;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace HttpClientApp
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            for(int i = 0; i < 10; i++)
+            {
+                using (var client = new HttpClient())
+                {
+                    await client.GetStringAsync("https://google.com");
+                }
+            }
         }
     }
 }
