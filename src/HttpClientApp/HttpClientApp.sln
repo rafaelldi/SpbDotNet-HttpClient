@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientApp", "HttpClientApp\HttpClientApp.csproj", "{E50D230C-6777-4EBB-93D0-15460A8B2C44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientWebApp", "HttpClientWebApp\HttpClientWebApp.csproj", "{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{E50D230C-6777-4EBB-93D0-15460A8B2C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E50D230C-6777-4EBB-93D0-15460A8B2C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E50D230C-6777-4EBB-93D0-15460A8B2C44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
