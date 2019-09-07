@@ -7,7 +7,7 @@ namespace HttpClientApp
     {
         static async Task Main(string[] args)
         {
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 using (var client = new HttpClient())
                 {
