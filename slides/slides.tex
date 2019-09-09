@@ -374,6 +374,178 @@ public SomeService(ISomeSiteClient someSiteClient)
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Создание HttpClient}
+Посмотрим глубже, как происходит создание $HttpClient$
+\newline
+\begin{figure}
+\includegraphics[scale=0.4]{dno}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Создание HttpClient}
+Посмотрим на наследование:
+\newline
+\begin{lstlisting}
+public class HttpClient : HttpMessageInvoker
+\end{lstlisting}
+\begin{lstlisting}
+public class HttpMessageInvoker : IDisposable
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Конструкторы HttpMessageInvoker}
+У $HttpMessageInvoker$ два конструктора:
+\newline
+\begin{lstlisting}
+public HttpMessageInvoker(HttpMessageHandler handler, bool disposeHandler)
+{
+  ...
+  this._handler = handler;
+  this._disposeHandler = disposeHandler;
+  ...
+}
+\end{lstlisting}
+\begin{lstlisting}
+public HttpMessageInvoker(HttpMessageHandler handler)
+  : this(handler, true)
+{
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Конструкторы HttpClient}
+У $HttpClient$ три конструктора:
+\newline
+\begin{lstlisting}
+public HttpClient(HttpMessageHandler handler, 
+  bool disposeHandler) : base(handler, disposeHandler)
+{
+  ...
+}
+\end{lstlisting}
+\begin{lstlisting}
+public HttpClient(HttpMessageHandler handler)
+  : this(handler, true)
+{
+}
+\end{lstlisting}
+\begin{lstlisting}
+public HttpClient()
+  : this((HttpMessageHandler) new HttpClientHandler())
+{
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{Конструкторы HttpClient}
+\begin{itemize}
+	\item 3 конструктора;
+	\item Есть возможность передать $HttpMessageHandler$;
+	\item В стандартном конструкторе $disposeHandler$ равен $true$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Dispose HttpClient}
+\begin{lstlisting}
+protected override void Dispose(bool disposing)
+{
+  if (disposing && !this._disposed)
+  {
+    this._disposed = true;
+    this._pendingRequestsCts.Cancel();
+    this._pendingRequestsCts.Dispose();
+  }
+  base.Dispose(disposing);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Dispose HttpMessageInvoker}
+\begin{lstlisting}
+public void Dispose()
+{
+  this.Dispose(true);
+  GC.SuppressFinalize((object) this);
+}
+
+protected virtual void Dispose(bool disposing)
+{
+  if (!disposing || this._disposed)
+    return;
+  this._disposed = true;
+  if (!this._disposeHandler)
+    return;
+  this._handler.Dispose();
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{Dispose HttpClient}
+\begin{itemize}
+	\item Отменяются все повисшие запросы $\Rightarrow$ eсли переиспользовать клиент, могут отменяться чужие запросы;
+	\item Флаг $disposed$ выставляется в $true$;
+	\item $Dispose$ вызывается у $HttpMessageHandler$ только в случае $disposeHandler = true$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Создание с помощью IHttpClientFactory}
+\begin{lstlisting}
+public static HttpClient CreateClient(this IHttpClientFactory factory)
+{
+  if (factory == null)
+    throw new ArgumentNullException(nameof (factory));
+  
+  return factory
+    .CreateClient(Microsoft.Extensions
+      .Options.Options.DefaultName);
+}
+
+...
+
+public static readonly string DefaultName = string.Empty;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Создание с помощью DefaultHttpClientFactory}
+\begin{lstlisting}
+public HttpClient CreateClient(string name)
+{
+  ...
+  HttpClient httpClient = 
+    new HttpClient(this.CreateHandler(name), false);
+  ...
+  return httpClient;
+}
+
+public HttpMessageHandler CreateHandler(string name)
+{
+  ActiveHandlerTrackingEntry entry = 
+    this._activeHandlers.GetOrAdd(name, this._entryFactory).Value;
+  this.StartHandlerEntryTimer(entry);
+  return (HttpMessageHandler) entry.Handler;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{Создание с помощью HttpClientFactory}
+\begin{itemize}
+	\item При создании через $HttpClientFactory$ в параметр $disposeHandler$ передаётся $false$ $\Rightarrow$ при $Dispose$ ничего не произойдёт;
+	\item $HttpClientFactory$ при создании проверяет наличие $Handler$ с соответствующим именем и по возможности использует его;
+	\item $HttpClientFactory$ выставляет таймер для $Handler$.
+\end{itemize}
+\end{frame}
+
 \section{Дополнительные улучшения в .NET Core 2.1}
 \begin{frame}
 \frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.delegatinghandler?view=netcore-2.2}{DelegatingHandler}}
