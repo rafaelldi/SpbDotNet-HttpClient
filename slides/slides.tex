@@ -704,7 +704,7 @@ return someData;
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Антипаттерн чтения в строку}
+\frametitle{Десериализуем из stream}
 \begin{lstlisting}
 var serializer = new JsonSerializer();
 var response = await client
@@ -718,6 +718,19 @@ using (var jsonReader = new JsonTextReader(sr))
     .Deserialize<SomeData>(jsonReader);
   return someData;
 }
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Десериализуем из stream в .net core 3.0}
+\begin{lstlisting}
+var response = await client
+  .GetAsync("/get-some-data");
+var stream = await response.Content
+  .ReadAsStreamAsync();
+var someDate = await JsonSerializer
+  .DeserializeAsync<SomeData>(stream);
+return someDate;
 \end{lstlisting}
 \end{frame}
 
