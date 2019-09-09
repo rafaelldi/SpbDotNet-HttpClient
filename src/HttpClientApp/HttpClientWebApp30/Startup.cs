@@ -18,6 +18,7 @@ namespace HttpClientWebApp30
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddHttpClient("some-site");
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
