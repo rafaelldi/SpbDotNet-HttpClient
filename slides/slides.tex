@@ -643,6 +643,82 @@ services.AddHttpClient("some-site")
 
 \section{HttpRequestMessage и HttpResponseMessage}
 \begin{frame}
+\frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage?view=netcore-2.2}{HttpRequestMessage}}
+Represents a HTTP request message. 
+\newline
+\newline
+Содержит в себе:
+\begin{itemize}
+	\item $HttpMethod\,method$;
+	\item $Uri\,requestUri$;
+	\item $HttpRequestHeaders\,headers$;
+	\item $Version\,version$, значение по умолчанию $Version(2, 0)$;
+	\item $HttpContent\,content$, который является $IDisposable$;
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Диспозить или нет?}
+Зависит от $HttpContent$. Чаще всего это $StringContent$ $\Rightarrow$ можно не диспозить.
+\end{frame}
+
+\begin{frame}
+\frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage?view=netcore-2.2}{HttpResponseMessage}}
+Represents a HTTP response message including the status code and data.
+\newline
+\newline
+Содержит в себе:
+\begin{itemize}
+	\item $HttpStatusCode\,statusCode$ (есть проверка $value > 0$ и $value < 999$);
+	\item $HttpResponseHeaders\,headers$;
+	\item $string\,reasonPhrase$
+	\item $HttpRequestMessage\,requestMessage$
+	\item $Version\,version$, значение по умолчанию $Version(1, 1)$;
+	\item $HttpContent\,content$, который является $IDisposable$;
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Диспозить или нет?}
+$HttpClient$ в методах $GetAsync$ и $SendAsync$ принимает параметр  $HttpCompletionOption$: $ResponseContentRead$, $ResponseHeadersRead$ (первый вариант по умолчанию).
+\newline
+\begin{itemize}
+	\item Если $ResponseContentRead$, то данные сохраняются в $MemoryStream$ $\Rightarrow$ можно без диспоза;
+	\item Иначе стоит диспозить. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Антипаттерн чтения в строку}
+Получаем данные, сохраняем в строку и десериализуем.
+\newline
+\begin{lstlisting}
+var response = await client
+  .GetAsync("/get-some-data");
+var str = await response.Content
+  .ReadAsStringAsync();
+var someData = JsonConvert
+  .DeserializeObject<SomeData>(str);
+return someData;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Антипаттерн чтения в строку}
+\begin{lstlisting}
+var serializer = new JsonSerializer();
+var response = await client
+  .GetAsync("/get-some-data");
+var stream = await response.Content
+  .ReadAsStreamAsync();
+using (var sr = new StreamReader(stream))
+using (var jsonReader = new JsonTextReader(sr))
+{
+  var someData = serializer
+    .Deserialize<SomeData>(jsonReader);
+  return someData;
+}
+\end{lstlisting}
 \end{frame}
 
 \section{Новое в .NET Core 3.0}
