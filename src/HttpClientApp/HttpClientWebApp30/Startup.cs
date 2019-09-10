@@ -1,4 +1,4 @@
-using System;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +20,6 @@ namespace HttpClientWebApp30
         {
             services.AddControllers();
             services.AddHttpClient("some-site");
-            services.AddGrpcClient<>(options =>
-            {
-                options.Address = new Uri("https://localhost:5001");
-            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

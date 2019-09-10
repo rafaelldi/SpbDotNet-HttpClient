@@ -735,7 +735,54 @@ return someDate;
 \end{frame}
 
 \section{Новое в .NET Core 3.0}
+\begin{frame}[fragile]
+\frametitle{Поддержка HTTP/2}
+Два способа:
+\newline
+\begin{lstlisting}
+using (var request = 
+  new HttpRequestMessage(HttpMethod.Get, "/") 
+    { Version = new Version(2, 0) })
+\end{lstlisting}
+\begin{lstlisting}
+var client = new HttpClient()
+{
+  BaseAddress = new Uri("https://localhost:5001"),
+  DefaultRequestVersion = new Version(2, 0)
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Регистрация gRPC Client}
+Схожий шаблон с $HttpClient$:
+\newline
+\begin{lstlisting}
+services
+  .AddGrpcClient<GreeterClient>(options =>
+  {
+    options.BaseAddress = 
+      new Uri("https://localhost:5001");
+  });
+\end{lstlisting}
+\end{frame}
+
 \begin{frame}
+\frametitle{Ссылки}
+\begin{itemize}
+	\item Слайды и примеры \href{https://github.com/rafaelldi/SpbDotNet-HttpClient}{https://github.com/rafaelldi/SpbDotNet-HttpClient};
+	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=netcore-2.2}{HttpClient Class};
+	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=netcore-2.2}{IDisposable Interface};
+	\item \href{https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/}{You're using HttpClient wrong and it is destabilizing your software};
+	\item \href{https://byterot.blogspot.com/2016/07/singleton-httpclient-dns.html}{Singleton HttpClient? Beware of this serious behaviour and how to fix it};
+	\item \href{https://nima-ara-blog.azurewebsites.net/beware-of-the-net-httpclient/}{Beware of the .NET HttpClient};
+	\item \href{https://habr.com/en/post/424873/}{Подводные камни HttpClient в .NET};
+	\item \href{https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2}{Make HTTP requests using IHttpClientFactory in ASP.NET Core}
+	\item \href{https://github.com/reactiveui/refit}{Refit};
+	\item \href{https://github.com/App-vNext/Polly}{Polly}
+	\item \href{https://devblogs.microsoft.com/dotnet/announcing-net-core-3-0-preview-6/}{Новость про HTTP/2};
+	\item \href{https://devblogs.microsoft.com/aspnet/asp-net-core-and-blazor-updates-in-net-core-3-0-preview-6/}{Новость про gRPC}.
+\end{itemize}
 \end{frame}
 
 \end{document}
