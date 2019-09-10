@@ -178,7 +178,7 @@ private static HttpClient Client = new HttpClient();
 	\item Класс $ServicePointManager$;
 	\item $ServicePointManager.DnsRefreshTimeout$ -- время, которое будет закеширован полученный IP адрес для каждого доменного имени, по умолчанию 2 минуты;
 	\item $ServicePoint.ConnectionLeaseTimeout$ -- время, которое соединение будет удерживаться открытым, по умолчанию не ограничено;
-	\item $ServicePoint.MaxIdleTime$ -- время бездействия, после которого соединение будет закрыто.
+	\item $ServicePoint.MaxIdleTime$ -- время бездействия, после которого соединение будет закрыто, по умолчанию 100 секунд.
 \end{itemize}
 \end{frame}
 
@@ -779,7 +779,7 @@ services
 	\item \href{https://habr.com/en/post/424873/}{Подводные камни HttpClient в .NET};
 	\item \href{https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2}{Make HTTP requests using IHttpClientFactory in ASP.NET Core}
 	\item \href{https://github.com/reactiveui/refit}{Refit};
-	\item \href{https://github.com/App-vNext/Polly}{Polly}
+	\item \href{https://github.com/App-vNext/Polly}{Polly};
 	\item \href{https://devblogs.microsoft.com/dotnet/announcing-net-core-3-0-preview-6/}{Новость про HTTP/2};
 	\item \href{https://devblogs.microsoft.com/aspnet/asp-net-core-and-blazor-updates-in-net-core-3-0-preview-6/}{Новость про gRPC}.
 \end{itemize}
