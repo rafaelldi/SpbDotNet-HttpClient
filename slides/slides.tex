@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[aspectratio=169]{beamer}
 
 \usepackage[T1,T2A]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -255,10 +255,8 @@ var response = await client.SendAsync(request);
 \begin{lstlisting}
 services.AddHttpClient("some-site", c =>
 {
-  c.BaseAddress = 
-    new Uri("https://some-site.com/");
-  c.DefaultRequestHeaders
-    .Add("Accept", "application/json");
+  c.BaseAddress = new Uri("https://some-site.com/");
+  c.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 \end{lstlisting}
 \item<2-> Добавление в конструктор с помощью DI:
@@ -285,10 +283,8 @@ public class SomeSiteClient
 
   public SomeSiteClient(HttpClient client)
   {
-    client.BaseAddress = 
-      new Uri("https://some-site.com/");
-    client.DefaultRequestHeaders
-      .Add("Accept", "application/json");
+    client.BaseAddress = new Uri("https://some-site.com/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 
     _client = client;
   }
@@ -308,8 +304,7 @@ public class SomeSiteClient
 
   public async Task<SomeData> GetSomeData()
   {
-    var response = 
-      await _client.GetAsync("/get-some-data");
+    var response = await _client.GetAsync("/get-some-data");
 
     ...
 
@@ -400,7 +395,8 @@ public class HttpMessageInvoker : IDisposable
 У $HttpMessageInvoker$ два конструктора:
 \newline
 \begin{lstlisting}
-public HttpMessageInvoker(HttpMessageHandler handler, bool disposeHandler)
+public HttpMessageInvoker(HttpMessageHandler handler, 
+  bool disposeHandler)
 {
   ...
   this._handler = handler;
@@ -499,14 +495,14 @@ protected virtual void Dispose(bool disposing)
 \begin{frame}[fragile]
 \frametitle{Создание с помощью IHttpClientFactory}
 \begin{lstlisting}
-public static HttpClient CreateClient(this IHttpClientFactory factory)
+public static HttpClient CreateClient(
+  this IHttpClientFactory factory)
 {
   if (factory == null)
     throw new ArgumentNullException(nameof (factory));
   
   return factory
-    .CreateClient(Microsoft.Extensions
-      .Options.Options.DefaultName);
+    .CreateClient(Microsoft.Extensions.Options.Options.DefaultName);
 }
 
 ...
@@ -561,7 +557,8 @@ public HttpMessageHandler CreateHandler(string name)
 \begin{lstlisting}
 public class SomeHandler : DelegatingHandler
 {
-  protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+  protected override async Task<HttpResponseMessage> SendAsync(
+    HttpRequestMessage request, CancellationToken cancellationToken)
   {
     ...
         
@@ -607,8 +604,7 @@ services.AddHttpClient("some-site")
 services.AddHttpClient("some-site")
   .AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
   .AddTransientHttpErrorPolicy(
-    p => p.CircuitBreakerAsync(5, 
-      TimeSpan.FromSeconds(30)));
+    p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 \end{lstlisting}
 \end{frame}
 
@@ -620,8 +616,7 @@ services.AddHttpClient("some-site")
   {
     return new SocketsHttpHandler()
     {
-      AutomaticDecompression = 
-        DecompressionMethods.GZip
+      AutomaticDecompression = DecompressionMethods.GZip
     };
   });
 \end{lstlisting}
@@ -693,12 +688,9 @@ $HttpClient$ в методах $GetAsync$ и $SendAsync$ принимает па
 Получаем данные, сохраняем в строку и десериализуем.
 \newline
 \begin{lstlisting}
-var response = await client
-  .GetAsync("/get-some-data");
-var str = await response.Content
-  .ReadAsStringAsync();
-var someData = JsonConvert
-  .DeserializeObject<SomeData>(str);
+var response = await client.GetAsync("/get-some-data");
+var str = await response.Content.ReadAsStringAsync();
+var someData = JsonConvert.DeserializeObject<SomeData>(str);
 return someData;
 \end{lstlisting}
 \end{frame}
@@ -707,15 +699,12 @@ return someData;
 \frametitle{Десериализуем из stream}
 \begin{lstlisting}
 var serializer = new JsonSerializer();
-var response = await client
-  .GetAsync("/get-some-data");
-var stream = await response.Content
-  .ReadAsStreamAsync();
+var response = await client.GetAsync("/get-some-data");
+var stream = await response.Content.ReadAsStreamAsync();
 using (var sr = new StreamReader(stream))
 using (var jsonReader = new JsonTextReader(sr))
 {
-  var someData = serializer
-    .Deserialize<SomeData>(jsonReader);
+  var someData = serializer.Deserialize<SomeData>(jsonReader);
   return someData;
 }
 \end{lstlisting}
@@ -724,12 +713,9 @@ using (var jsonReader = new JsonTextReader(sr))
 \begin{frame}[fragile]
 \frametitle{Десериализуем из stream в .net core 3.0}
 \begin{lstlisting}
-var response = await client
-  .GetAsync("/get-some-data");
-var stream = await response.Content
-  .ReadAsStreamAsync();
-var someDate = await JsonSerializer
-  .DeserializeAsync<SomeData>(stream);
+var response = await client.GetAsync("/get-some-data");
+var stream = await response.Content.ReadAsStreamAsync();
+var someDate = await JsonSerializer.DeserializeAsync<SomeData>(stream);
 return someDate;
 \end{lstlisting}
 \end{frame}
@@ -739,11 +725,13 @@ return someDate;
 \frametitle{Поддержка HTTP/2}
 Два способа:
 \newline
+\begin{enumerate}
+\item 
 \begin{lstlisting}
-using (var request = 
-  new HttpRequestMessage(HttpMethod.Get, "/") 
-    { Version = new Version(2, 0) })
+using (var request = new HttpRequestMessage(HttpMethod.Get, "/") 
+  { Version = new Version(2, 0) })
 \end{lstlisting}
+\item 
 \begin{lstlisting}
 var client = new HttpClient()
 {
@@ -751,6 +739,7 @@ var client = new HttpClient()
   DefaultRequestVersion = new Version(2, 0)
 };
 \end{lstlisting}
+\end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -758,11 +747,9 @@ var client = new HttpClient()
 Схожий шаблон с $HttpClient$:
 \newline
 \begin{lstlisting}
-services
-  .AddGrpcClient<GreeterClient>(options =>
+services.AddGrpcClient<GreeterClient>(options =>
   {
-    options.BaseAddress = 
-      new Uri("https://localhost:5001");
+    options.BaseAddress = new Uri("https://localhost:5001");
   });
 \end{lstlisting}
 \end{frame}
@@ -770,7 +757,7 @@ services
 \begin{frame}
 \frametitle{Ссылки}
 \begin{itemize}
-	\item Слайды и примеры \href{https://github.com/rafaelldi/SpbDotNet-HttpClient}{https://github.com/rafaelldi/SpbDotNet-HttpClient};
+	\item \href{Слайды и примеры https://github.com/rafaelldi/SpbDotNet-HttpClient}{https://github.com/rafaelldi/SpbDotNet-HttpClient};
 	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=netcore-2.2}{HttpClient Class};
 	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=netcore-2.2}{IDisposable Interface};
 	\item \href{https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/}{You're using HttpClient wrong and it is destabilizing your software};
