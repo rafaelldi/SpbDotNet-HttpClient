@@ -1,4 +1,4 @@
-\documentclass[aspectratio=169]{beamer}
+\documentclass[17pt,aspectratio=169]{beamer}
 
 \usepackage[T1,T2A]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -65,7 +65,7 @@ basicstyle=\ttfamily\small
 
 \begin{frame}{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=netcore-2.2}{HttpClient Class}}
     \begin{itemize}
-        \item <1-> Provides a base class for sending HTTP requests and receiving HTTP responses from a resource identified by a URI;
+        \item <1-> Базовый класс для отправки HTTP-запросов и получения HTTP-ответов;
         \item <2-> $GetAsync(\ldots)$, $PostAsync(\ldots)$, $SendAsync(\ldots)$ и др.;
         \item <3-> $HttpClient$ реализует $IDisposable$.
     \end{itemize}
@@ -73,7 +73,7 @@ basicstyle=\ttfamily\small
 
 \begin{frame}{\href{https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=netcore-2.2}{IDisposable Interface}}
     \begin{itemize}
-        \item <1-> Provides a mechanism for releasing unmanaged resources;
+        \item <1-> Предоставляет механизм для освобождения неуправляемых ресурсов;
         \item <2-> $public\,void\,Dispose()$;
         \item <3-> Конструкция $using(\ldots)$;
         \item <4-> Диспозиться\,\textrightarrow \,диспозь
@@ -86,16 +86,19 @@ basicstyle=\ttfamily\small
         \item $public\,void\,Dispose()$;
         \item Конструкция $using(\ldots)$;
         \item \sout{Диспозиться\,\textrightarrow \,диспозь}
-        \item Диспозиться\,\textrightarrow \,внимательней
+        \item Диспозиться\,\textrightarrow \,будь внимательней
     \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Disposable HttpClient}
+Мотивация:
+\newline
 \begin{lstlisting}
 using(var client = new HttpClient())
 {
-  var response = await client.GetStringAsync(...);
+  var response = 
+    await client.GetStringAsync(...);
 }
 \end{lstlisting}
 \end{frame}
@@ -116,7 +119,8 @@ for(int i = 0; i < 10; i++)
 {
   using (var client = new HttpClient())
   {
-    await client.GetStringAsync("https://google.com");
+    await client
+      .GetStringAsync("https://google.com");
   }
 }
 \end{lstlisting}
@@ -134,14 +138,14 @@ for(int i = 0; i < 10; i++)
 \frametitle{Проблема socket exhaustion}
 \begin{itemize}
 	\item 10 сокетов в состоянии \textit{TIME WAIT};
-	\item Соединение закрыто с одной стороны, но мы всё ещё ждём доходящие пакеты, чтобы правильно их обработать;
+	\item Соединение закрыто с одной стороны, но ещё ждём доходящие пакеты;
 	\item Приводит к $SocketException$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Проблема socket exhaustion}
-``HttpClient is intended to be instantiated once and re-used throughout the life of an application. Instantiating an HttpClient class for every request will exhaust the number of sockets available under heavy loads.''
+``HttpClient предназначен для однократного создания экземпляра и повторного использования в течение всего жизненного цикла приложения.''
 \newline
 \newline
 \textit{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient}{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient}}
@@ -150,8 +154,10 @@ for(int i = 0; i < 10; i++)
 \begin{frame}[fragile]
 \frametitle{Проблема socket exhaustion}
 Решение проблемы - переиспользование клиента:
+\newline
 \begin{lstlisting}
-private static HttpClient Client = new HttpClient();
+private static HttpClient Client 
+  = new HttpClient();
 \end{lstlisting}
 \end{frame}
 
@@ -175,29 +181,29 @@ private static HttpClient Client = new HttpClient();
 \frametitle{Проблема кеширования DNS}
 Решение для .NET Framework:
 \begin{itemize}
-	\item Класс $ServicePointManager$;
-	\item $ServicePointManager.DnsRefreshTimeout$ -- время, которое будет закеширован полученный IP адрес для каждого доменного имени, по умолчанию 2 минуты;
-	\item $ServicePoint.ConnectionLeaseTimeout$ -- время, которое соединение будет удерживаться открытым, по умолчанию не ограничено;
-	\item $ServicePoint.MaxIdleTime$ -- время бездействия, после которого соединение будет закрыто, по умолчанию 100 секунд.
+	\item <1-> Класс $ServicePointManager$;
+	\item <2-> $ServicePointManager.DnsRefreshTimeout$ (2 мин);
+	\item <3-> $ServicePoint.ConnectionLeaseTimeout$ (не ограничено);
+	\item <4-> $ServicePoint.MaxIdleTime$ (100 сек).
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Проблема кеширования DNS}
 Пример:
-\\
+\newline
 \begin{lstlisting}
 ServicePointManager.DnsRefreshTimeout = 60000;
 
-var sp = ServicePointManager.FindServicePoint(
-  new Uri("https://google.com"));
+var sp = ServicePointManager
+  .FindServicePoint(new Uri("http://site.com"));
 sp.ConnectionLeaseTimeout = 60000;
 sp.MaxIdleTime = 60000;
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}
-\frametitle{Лимит одновременных соединений с сервером}
+\frametitle{Лимит одновременных соединений}
 \href{https://habr.com/ru/post/424873/}{https://habr.com/ru/post/424873/}
 \begin{figure}
 \includegraphics[scale=0.4]{habr}
@@ -205,93 +211,99 @@ sp.MaxIdleTime = 60000;
 \end{frame}
 
 \begin{frame}
-\frametitle{Лимит одновременных соединений с сервером}
+\frametitle{Лимит одновременных соединений}
 \begin{itemize}
-	\item Лимит одновременных соединений с сервером по умолчанию равен 2;
-	\item $ServicePointManager.DefaultConnectionLimit$;
-	\item Для $localhost$ по умолчанию равен $int.MaxValue$;
-	\item Только для .NET Framework.
+	\item <1-> Лимит по умолчанию равен 2;
+	\item <2-> $ServicePointManager.DefaultConnectionLimit$;
+	\item <3-> Для $localhost$ по умолчанию равен $int.MaxValue$;
+	\item <4-> Только для .NET Framework.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item Нельзя на каждый запрос переоткрывать соединение;
+	\item Нельзя постоянно держать соединение открытым;
+	\item Вручную управлять сложно.
 \end{itemize}
 \end{frame}
 
 \section{Интерфейс IHttpClientFactory}
 \begin{frame}
 \frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.ihttpclientfactory?view=aspnetcore-2.2}{IHttpClientFactory}}
-\begin{block}{IHttpClientFactory}
-An IHttpClientFactory can be registered and used to configure and create HttpClient instances in an app.
-\end{block}
-Интерфейс был добавлен в ASP.NET Core 2.1.
-\newline
-\newline
-Для консольного приложения придётся добавить \href{https://www.nuget.org/packages/Microsoft.Extensions.Hosting}{$Microsoft.Extensions.Hosting$} и \href{https://www.nuget.org/packages/Microsoft.Extensions.Http}{$Microsoft.Extensions.Http$}.
+\begin{itemize}
+	\item <1-> Позволяет создавать и конфигурировать $HttpClient$;
+	\item <2-> Был добавлен в ASP.NET Core 2.1;
+	\item <3-> Для консольного приложения необходимо добавить \href{https://www.nuget.org/packages/Microsoft.Extensions.Hosting}{$Microsoft.Extensions.Hosting$} и \href{https://www.nuget.org/packages/Microsoft.Extensions.Http}{$Microsoft.Extensions.Http$}
+\end{itemize}.
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{IHttpClientFactory - базовое использование}
-\begin{itemize}
-\item<1-> Регистрация через метод расширения $IServiceCollection$:
+\frametitle{IHttpClientFactory}
+Регистрация через метод расширения $IServiceCollection$:
+\newline
 \begin{lstlisting}
 services.AddHttpClient();
 \end{lstlisting}
-\item<2-> Добавление в конструктор с помощью DI:
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{IHttpClientFactory}
+Добавление в конструктор с помощью DI:
+\newline
 \begin{lstlisting}
 public SomeService(IHttpClientFactory clientFactory)
 {
   _clientFactory = clientFactory;
 }
 \end{lstlisting}
-\item<3-> Создание клиента (без $using$):
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{IHttpClientFactory}
+Создание клиента:
+\newline
 \begin{lstlisting}
 var client = _clientFactory.CreateClient();
 var response = await client.SendAsync(request);
 \end{lstlisting}
-\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Named clients}
-\begin{itemize}
-\item<1-> Регистрация через метод расширения $IServiceCollection$:
+Регистрация через метод расширения $IServiceCollection$:
+\newline
 \begin{lstlisting}
 services.AddHttpClient("some-site", c =>
 {
-  c.BaseAddress = new Uri("https://some-site.com/");
-  c.DefaultRequestHeaders.Add("Accept", "application/json");
+  c.BaseAddress = 
+    new Uri("https://some-site.com/");
+  c.DefaultRequestHeaders
+    .Add("Accept", "application/json");
 });
 \end{lstlisting}
-\item<2-> Добавление в конструктор с помощью DI:
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Named clients}
+Добавление в конструктор с помощью DI:
+\newline
 \begin{lstlisting}
 public SomeService(IHttpClientFactory clientFactory)
 {
   _clientFactory = clientFactory;
 }
 \end{lstlisting}
-\item<3-> Создание клиента:
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Named clients}
+Создание клиента:
+\newline
 \begin{lstlisting}
 var client = _clientFactory.CreateClient("some-site");
 \end{lstlisting}
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Typed clients}
-Класс типизированного клиента:
-\begin{lstlisting}
-public class SomeSiteClient
-{
-  private readonly HttpClient _client;
-
-  public SomeSiteClient(HttpClient client)
-  {
-    client.BaseAddress = new Uri("https://some-site.com/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-
-    _client = client;
-  }
-    
-  ...
-}
-\end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -301,72 +313,98 @@ public class SomeSiteClient
 public class SomeSiteClient
 {
   ...
-
-  public async Task<SomeData> GetSomeData()
-  {
-    var response = await _client.GetAsync("/get-some-data");
-
-    ...
-
-    return result;
-  }
 }
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Typed clients}
-\begin{itemize}
-\item<1-> Регистрация типизированного клиента:
+Класс типизированного клиента:
+\begin{lstlisting}
+private readonly HttpClient _client;
+public SomeSiteClient(HttpClient client)
+{
+  client.BaseAddress = new Uri("https://some-site.com/");
+  client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+  _client = client;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Typed clients}
+Класс типизированного клиента:
+\begin{lstlisting}
+public async Task<SomeData> GetSomeData()
+{
+  var response = 
+    await _client.GetAsync("/get-some-data");
+  ...
+  return result;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Typed clients}
+Регистрация типизированного клиента:
+\newline
 \begin{lstlisting}
 services.AddHttpClient<SomeSiteClient>();
 \end{lstlisting}
-\item<2-> Добавление в конструктор через DI:
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Typed clients}
+Добавление в конструктор через DI:
+\newline
 \begin{lstlisting}
 public SomeService(SomeSiteClient someSiteClient)
 {
   _someSiteClient = someSiteClient;
 }
 \end{lstlisting}
-\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Refit}
+\frametitle{\href{https://github.com/reactiveui/refit}{Refit}}
 Библиотека Refit для REST API (\href{https://github.com/reactiveui/refit}{https://github.com/reactiveui/refit})
-\newline
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\href{https://github.com/reactiveui/refit}{Refit}}
 \begin{lstlisting}
 public interface ISomeSiteClient
 {
   [Get("/get-some-data")]
   Task<SomeData> GetSomeData();
 }
-
-public class SomeData
-{
-  public string Message { get; set; }
-}
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Refit}
-\begin{itemize}
-\item<1-> Регистрация клиента:
+\frametitle{\href{https://github.com/reactiveui/refit}{Refit}}
+Регистрация клиента:
+\newline
 \begin{lstlisting}
 services
   .AddRefitClient<ISomeSiteClient>()
   .ConfigureHttpClient(c => c.BaseAddress = 
     new Uri("https://some-site.com"));
 \end{lstlisting}
-\item<2-> Добавление в конструктор через DI:
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\href{https://github.com/reactiveui/refit}{Refit}}
+Добавление в конструктор через DI:
+\newline
 \begin{lstlisting}
 public SomeService(ISomeSiteClient someSiteClient)
 {
   _someSiteClient = someSiteClient;
 }
 \end{lstlisting}
-\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -380,8 +418,6 @@ public SomeService(ISomeSiteClient someSiteClient)
 
 \begin{frame}[fragile]
 \frametitle{Создание HttpClient}
-Посмотрим на наследование:
-\newline
 \begin{lstlisting}
 public class HttpClient : HttpMessageInvoker
 \end{lstlisting}
@@ -392,48 +428,21 @@ public class HttpMessageInvoker : IDisposable
 
 \begin{frame}[fragile]
 \frametitle{Конструкторы HttpMessageInvoker}
-У $HttpMessageInvoker$ два конструктора:
-\newline
 \begin{lstlisting}
-public HttpMessageInvoker(HttpMessageHandler handler, 
-  bool disposeHandler)
-{
-  ...
-  this._handler = handler;
-  this._disposeHandler = disposeHandler;
-  ...
-}
-\end{lstlisting}
-\begin{lstlisting}
-public HttpMessageInvoker(HttpMessageHandler handler)
-  : this(handler, true)
-{
-}
+public HttpMessageInvoker(HttpMessageHandler handler, bool disposeHandler)
+
+public HttpMessageInvoker(HttpMessageHandler handler) : this(handler, true)
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Конструкторы HttpClient}
-У $HttpClient$ три конструктора:
-\newline
 \begin{lstlisting}
-public HttpClient(HttpMessageHandler handler, 
-  bool disposeHandler) : base(handler, disposeHandler)
-{
-  ...
-}
-\end{lstlisting}
-\begin{lstlisting}
-public HttpClient(HttpMessageHandler handler)
-  : this(handler, true)
-{
-}
-\end{lstlisting}
-\begin{lstlisting}
-public HttpClient()
-  : this((HttpMessageHandler) new HttpClientHandler())
-{
-}
+public HttpClient(HttpMessageHandler handler, bool disposeHandler) : base(handler, disposeHandler)
+
+public HttpClient(HttpMessageHandler handler) : this(handler, true)
+
+public HttpClient() : this((HttpMessageHandler) new HttpClientHandler())
 \end{lstlisting}
 \end{frame}
 
@@ -470,7 +479,12 @@ public void Dispose()
   this.Dispose(true);
   GC.SuppressFinalize((object) this);
 }
+\end{lstlisting}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Dispose HttpMessageInvoker}
+\begin{lstlisting}
 protected virtual void Dispose(bool disposing)
 {
   if (!disposing || this._disposed)
@@ -486,44 +500,41 @@ protected virtual void Dispose(bool disposing)
 \begin{frame}
 \frametitle{Dispose HttpClient}
 \begin{itemize}
-	\item Отменяются все повисшие запросы $\Rightarrow$ eсли переиспользовать клиент, могут отменяться чужие запросы;
+	\item Отменяются все повисшие запросы $\Rightarrow$ могут отменяться чужие запросы;
 	\item Флаг $disposed$ выставляется в $true$;
 	\item $Dispose$ вызывается у $HttpMessageHandler$ только в случае $disposeHandler = true$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Создание с помощью IHttpClientFactory}
+\frametitle{IHttpClientFactory}
 \begin{lstlisting}
 public static HttpClient CreateClient(
   this IHttpClientFactory factory)
 {
-  if (factory == null)
-    throw new ArgumentNullException(nameof (factory));
-  
   return factory
-    .CreateClient(Microsoft.Extensions.Options.Options.DefaultName);
+    .CreateClient(DefaultName);
 }
-
-...
-
-public static readonly string DefaultName = string.Empty;
 \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Создание с помощью DefaultHttpClientFactory}
+\frametitle{DefaultHttpClientFactory}
 \begin{lstlisting}
 public HttpClient CreateClient(string name)
 {
-  ...
-  HttpClient httpClient = 
-    new HttpClient(this.CreateHandler(name), false);
-  ...
+  HttpClient httpClient = new 
+    HttpClient(this.CreateHandler(name), false);
   return httpClient;
 }
+\end{lstlisting}
+\end{frame}
 
-public HttpMessageHandler CreateHandler(string name)
+\begin{frame}[fragile]
+\frametitle{DefaultHttpClientFactory}
+\begin{lstlisting}
+public HttpMessageHandler CreateHandler(
+  string name)
 {
   ActiveHandlerTrackingEntry entry = 
     this._activeHandlers.GetOrAdd(name, this._entryFactory).Value;
@@ -536,9 +547,19 @@ public HttpMessageHandler CreateHandler(string name)
 \begin{frame}
 \frametitle{Создание с помощью HttpClientFactory}
 \begin{itemize}
-	\item При создании через $HttpClientFactory$ в параметр $disposeHandler$ передаётся $false$ $\Rightarrow$ при $Dispose$ ничего не произойдёт;
-	\item $HttpClientFactory$ при создании проверяет наличие $Handler$ с соответствующим именем и по возможности использует его;
+	\item $Dispose$ не имеет эффекта;
+	\item $HttpClientFactory$ переиспользует $Handler$;
 	\item $HttpClientFactory$ выставляет таймер для $Handler$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item Named clients, Typed client, Refit;
+	\item Переиспользуют $HttpMessageHandler$;
+	\item Закрывают $HttpMessageHandler$ спустя время;
+	\item $HttpClient$ не $IDisposable$.
 \end{itemize}
 \end{frame}
 
@@ -548,7 +569,7 @@ public HttpMessageHandler CreateHandler(string name)
 \begin{itemize}
 \item $DelegatingHandler$ позволяют создать цепочку обработки исходящих запросов;
 \item Схоже с middleware в ASP.NET Core;
-\item Функциональность уже была, но с $IHttpClientFactory$ стало проще использовать.
+\item Функциональность была, но с $IHttpClientFactory$ стало проще использовать.
 \end{itemize}
 \end{frame}
 
@@ -556,19 +577,10 @@ public HttpMessageHandler CreateHandler(string name)
 \frametitle{Создание DelegatingHandler}
 \begin{lstlisting}
 public class SomeHandler : DelegatingHandler
-{
-  protected override async Task<HttpResponseMessage> SendAsync(
-    HttpRequestMessage request, CancellationToken cancellationToken)
-  {
-    ...
-        
-    var response = await base.SendAsync(request, cancellationToken);
 
-    ...
-        
-    return response;        
-  }
-}
+override SendAsync(...)
+       
+var response = await base.SendAsync(request, cancellationToken);        
 \end{lstlisting}
 \end{frame}
 
@@ -585,20 +597,24 @@ services.AddHttpClient("some-site")
 
 \begin{frame}
 \frametitle{\href{https://github.com/App-vNext/Polly}{Polly}}
-\begin{itemize}
-\item \href{https://github.com/App-vNext/Polly}{Polly} - популярная библиотека обработки ошибок;
-\item Содержит различные политики: Retry, Circuit Breaker, Timeout, \ldots
-\item Необходимо установить \href{https://www.nuget.org/packages/Microsoft.Extensions.Http.Polly/}{$Microsoft.Extensions.Http.Polly$};
-\item Подходит не только для $HttpClient$.
-\end{itemize}
+Библиотека Polly для обработки ошибок (\href{https://github.com/App-vNext/Polly}{https://github.com/App-vNext/Polly})
 \begin{figure}
 \includegraphics[scale=0.4]{polly}
 \end{figure}
 \end{frame}
 
+\begin{frame}
+\frametitle{\href{https://github.com/App-vNext/Polly}{Polly}}
+\begin{itemize}
+\item Подходит не только для $HttpClient$;
+\item Содержит различные политики: Retry, Circuit Breaker, Timeout, \ldots
+\item Необходимо установить \href{https://www.nuget.org/packages/Microsoft.Extensions.Http.Polly/}{$Microsoft.Extensions.Http.Polly$}.
+\end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]
 \frametitle{Добавление политик}
-Обработка всех ответов со статус кодами 5xx и 408.
+Обработка всех ответов со статус кодами 5xx и 408
 \newline
 \begin{lstlisting}
 services.AddHttpClient("some-site")
@@ -623,26 +639,36 @@ services.AddHttpClient("some-site")
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Настройка времени жизни \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.socketshttphandler?view=netcore-2.2}{HttpMessageHandler}}
+\frametitle{Настройка внутреннего \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.socketshttphandler?view=netcore-2.2}{HttpMessageHandler}}
 \begin{itemize}
-\item Для каждого именованного клиента есть свой $HttpMessageHandler$;
-\item $IHttpClientFactory$ при создании нового $HttpClient$ будет переиспользовать $HttpMessageHandler$, если его время жизни не вышло;
-\item Время жизни по умолчанию 2 минуты.
+\item $AllowAutoRedirect$;
+\item $AutomaticDecompression$;
+\item $MaxAutomaticRedirections$;
+\item $MaxResponseHeadersLength$;
+\item \ldots
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Время жизни \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.socketshttphandler?view=netcore-2.2}{HttpMessageHandler}}
 \begin{lstlisting}
 services.AddHttpClient("some-site")
   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item Добавились методы для удобной настройки $HttpClient$.
+\end{itemize}
+\end{frame}
+
 
 \section{HttpRequestMessage и HttpResponseMessage}
 \begin{frame}
 \frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage?view=netcore-2.2}{HttpRequestMessage}}
-Represents a HTTP request message. 
-\newline
-\newline
-Содержит в себе:
+Представляет сообщение HTTP-запроса. 
 \begin{itemize}
 	\item $HttpMethod\,method$;
 	\item $Uri\,requestUri$;
@@ -659,10 +685,7 @@ Represents a HTTP request message.
 
 \begin{frame}
 \frametitle{\href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage?view=netcore-2.2}{HttpResponseMessage}}
-Represents a HTTP response message including the status code and data.
-\newline
-\newline
-Содержит в себе:
+Представляет ответное сообщение HTTP.
 \begin{itemize}
 	\item $HttpStatusCode\,statusCode$ (есть проверка $value > 0$ и $value < 999$);
 	\item $HttpResponseHeaders\,headers$;
@@ -675,9 +698,9 @@ Represents a HTTP response message including the status code and data.
 
 \begin{frame}
 \frametitle{Диспозить или нет?}
-$HttpClient$ в методах $GetAsync$ и $SendAsync$ принимает параметр  $HttpCompletionOption$: $ResponseContentRead$, $ResponseHeadersRead$ (первый вариант по умолчанию).
-\newline
 \begin{itemize}
+	\item Для $GetAsync$ и $SendAsync$;
+	\item $HttpCompletionOption$: $ResponseContentRead$, $ResponseHeadersRead$;
 	\item Если $ResponseContentRead$, то данные сохраняются в $MemoryStream$ $\Rightarrow$ можно без диспоза;
 	\item Иначе стоит диспозить. 
 \end{itemize}
@@ -685,8 +708,6 @@ $HttpClient$ в методах $GetAsync$ и $SendAsync$ принимает па
 
 \begin{frame}[fragile]
 \frametitle{Антипаттерн чтения в строку}
-Получаем данные, сохраняем в строку и десериализуем.
-\newline
 \begin{lstlisting}
 var response = await client.GetAsync("/get-some-data");
 var str = await response.Content.ReadAsStringAsync();
@@ -698,14 +719,13 @@ return someData;
 \begin{frame}[fragile]
 \frametitle{Десериализуем из stream}
 \begin{lstlisting}
-var serializer = new JsonSerializer();
+var srz = new JsonSerializer();
 var response = await client.GetAsync("/get-some-data");
 var stream = await response.Content.ReadAsStreamAsync();
 using (var sr = new StreamReader(stream))
 using (var jsonReader = new JsonTextReader(sr))
 {
-  var someData = serializer.Deserialize<SomeData>(jsonReader);
-  return someData;
+  return srz.Deserialize<SomeData>(jsonReader);
 }
 \end{lstlisting}
 \end{frame}
@@ -720,26 +740,33 @@ return someDate;
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item $HttpRequestMessage$ и $HttpResponseMessage$ иногда можно не диспозить;
+	\item Лучше не использовать промежуточную строку при десериализации.
+\end{itemize}
+\end{frame}
+
 \section{Новое в .NET Core 3.0}
 \begin{frame}[fragile]
 \frametitle{Поддержка HTTP/2}
-Два способа:
-\newline
-\begin{enumerate}
-\item 
 \begin{lstlisting}
-using (var request = new HttpRequestMessage(HttpMethod.Get, "/") 
-  { Version = new Version(2, 0) })
+using (var request = 
+  new HttpRequestMessage(HttpMethod.Get, "/") 
+    { Version = new Version(2, 0) })
 \end{lstlisting}
-\item 
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Поддержка HTTP/2}
 \begin{lstlisting}
 var client = new HttpClient()
 {
-  BaseAddress = new Uri("https://localhost:5001"),
+  BaseAddress = new Uri("https://localhost:80"),
   DefaultRequestVersion = new Version(2, 0)
 };
 \end{lstlisting}
-\end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -758,17 +785,19 @@ services.AddGrpcClient<GreeterClient>(options =>
 \frametitle{Ссылки}
 \begin{itemize}
 	\item \href{Слайды и примеры https://github.com/rafaelldi/SpbDotNet-HttpClient}{https://github.com/rafaelldi/SpbDotNet-HttpClient};
-	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=netcore-2.2}{HttpClient Class};
-	\item \href{https://docs.microsoft.com/en-us/dotnet/api/system.idisposable?view=netcore-2.2}{IDisposable Interface};
 	\item \href{https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/}{You're using HttpClient wrong and it is destabilizing your software};
 	\item \href{https://byterot.blogspot.com/2016/07/singleton-httpclient-dns.html}{Singleton HttpClient? Beware of this serious behaviour and how to fix it};
 	\item \href{https://nima-ara-blog.azurewebsites.net/beware-of-the-net-httpclient/}{Beware of the .NET HttpClient};
 	\item \href{https://habr.com/en/post/424873/}{Подводные камни HttpClient в .NET};
-	\item \href{https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2}{Make HTTP requests using IHttpClientFactory in ASP.NET Core}
-	\item \href{https://github.com/reactiveui/refit}{Refit};
-	\item \href{https://github.com/App-vNext/Polly}{Polly};
-	\item \href{https://devblogs.microsoft.com/dotnet/announcing-net-core-3-0-preview-6/}{Новость про HTTP/2};
-	\item \href{https://devblogs.microsoft.com/aspnet/asp-net-core-and-blazor-updates-in-net-core-3-0-preview-6/}{Новость про gRPC}.
+	\item \href{https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2}{Make HTTP requests using IHttpClientFactory in ASP.NET Core}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Контакты}
+\begin{itemize}
+	\item Email rival.abdrakhamnov@gmail.com;
+	\item Блог \href{https://arcadeprogramming.com/}{https://arcadeprogramming.com/}.
 \end{itemize}
 \end{frame}
 
