@@ -20,7 +20,8 @@ namespace HttpClientWebApp
                     c.BaseAddress = new Uri("https://some-site.com");
                     c.DefaultRequestHeaders.Add("Accept", "application/json");
                 })
-                .AddHttpMessageHandler<SomeHandler>()
+                .AddHttpMessageHandler<TimerHandler>()
+                .AddHttpMessageHandler<HeadersHandler>()
                 .AddTransientHttpErrorPolicy(p => p.RetryAsync(3))
                 .AddTransientHttpErrorPolicy(p => p.CircuitBreaker(5, TimeSpan.FromSeconds(5)))
                 .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
