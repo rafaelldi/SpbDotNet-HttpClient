@@ -545,9 +545,9 @@ protected virtual void Dispose(bool disposing)
 \begin{frame}
 \frametitle{Dispose HttpClient}
 \begin{itemize}
-	\item <1-> Отменяются все повисшие запросы $\Rightarrow$ могут отменяться чужие запросы;
+	\item <1-> Отменяются все запросы $\Rightarrow$ могут отменяться чужие запросы;
 	\item <2-> Не стоит шарить $HttpClient$;
-	\item <3-> Флаг $disposed$ выставляется в $true$;
+	\item <3-> После $Dispose$ использовать нельзя;
 	\item <4-> $Dispose$ вызывается у $HttpMessageHandler$ только в случае $disposeHandler = true$.
 \end{itemize}
 \end{frame}
@@ -617,6 +617,13 @@ public HttpMessageHandler CreateHandler(
 	\item <2-> Схоже с middleware в ASP.NET Core;
 	\item <3-> Функциональность была, но с $IHttpClientFactory$ стало проще использовать.
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{DelegatingHandler}
+\begin{figure}
+\includegraphics[scale=0.65]{handlers}
+\end{figure}
 \end{frame}
 
 \begin{frame}[fragile]
