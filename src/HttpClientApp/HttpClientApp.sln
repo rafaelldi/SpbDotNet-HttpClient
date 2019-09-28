@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientApp", "HttpClientApp\HttpClientApp.csproj", "{E50D230C-6777-4EBB-93D0-15460A8B2C44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientWebApp", "HttpClientWebApp\HttpClientWebApp.csproj", "{CC3E9181-FC2F-4FEA-9EB7-FF763F8234E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientWebApp30", "HttpClientWebApp30\HttpClientWebApp30.csproj", "{9A686608-F6EC-4891-8CBA-12B600D8CB54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientVersion", "HttpClientVersion\HttpClientVersion.csproj", "{58ABCC23-C38B-4012-800B-FF45CF540FFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,5 +27,9 @@ Global
 		{9A686608-F6EC-4891-8CBA-12B600D8CB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A686608-F6EC-4891-8CBA-12B600D8CB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A686608-F6EC-4891-8CBA-12B600D8CB54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58ABCC23-C38B-4012-800B-FF45CF540FFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58ABCC23-C38B-4012-800B-FF45CF540FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58ABCC23-C38B-4012-800B-FF45CF540FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58ABCC23-C38B-4012-800B-FF45CF540FFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
