@@ -932,6 +932,14 @@ services.AddGrpcClient<GreeterClient>(options =>
 \end{frame}
 
 \begin{frame}
+\frametitle{Общий вывод}
+\begin{itemize}
+	\item В .NET Framework используйте $ServicePointManager$;
+	\item В .NET Core используйте $IHttpClientFactory$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Ссылки}
 \begin{itemize}
 	\item \href{https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/}{You're using HttpClient wrong and it is destabilizing your software};
@@ -939,7 +947,7 @@ services.AddGrpcClient<GreeterClient>(options =>
 	\item \href{https://nima-ara-blog.azurewebsites.net/beware-of-the-net-httpclient/}{Beware of the .NET HttpClient};
 	\item \href{https://habr.com/en/post/424873/}{Подводные камни HttpClient в .NET};
 	\item \href{https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2}{Make HTTP requests using IHttpClientFactory in ASP.NET Core};
-	\item \href{https://www.stevejgordon.co.uk}{https://www.stevejgordon.co.uk}.
+	\item \href{https://www.stevejgordon.co.uk}{Steve Gordon https://www.stevejgordon.co.uk}.
 \end{itemize}
 \end{frame}
 
