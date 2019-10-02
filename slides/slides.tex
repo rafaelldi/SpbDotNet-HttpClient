@@ -76,7 +76,7 @@ basicstyle=\ttfamily\small
         \item <1-> Предоставляет механизм для освобождения неуправляемых ресурсов;
         \item <2-> $public\,void\,Dispose()$;
         \item <3-> Конструкция $using(\ldots)$;
-        \item <4-> Диспозиться\,\textrightarrow \,диспозь
+        \item <4-> Диспозится\,\textrightarrow \,диспозь
     \end{itemize}
 \end{frame}
 
@@ -85,8 +85,8 @@ basicstyle=\ttfamily\small
         \item Предоставляет механизм для освобождения неуправляемых ресурсов;
         \item $public\,void\,Dispose()$;
         \item Конструкция $using(\ldots)$;
-        \item \sout{Диспозиться\,\textrightarrow \,диспозь}
-        \item Диспозиться\,\textrightarrow \,будь внимательней
+        \item \sout{Диспозится\,\textrightarrow \,диспозь}
+        \item Диспозится\,\textrightarrow \,будь внимательней
     \end{itemize}
 \end{frame}
 
@@ -192,7 +192,7 @@ public static HttpClient Client =
 \end{frame}
 
 \begin{frame}
-\frametitle{Проблема кеширования DNS}
+\frametitle{Решение при балансировщике}
 Решение для .NET Framework:
 \begin{itemize}
 	\item <1-> Класс $ServicePointManager$;
@@ -223,7 +223,8 @@ var client = new HttpClient();
 var tasks = new List<Task>();
 for (var i = 0; i < 20; i++)
 {
-  tasks.Add(client.GetStringAsync(...));
+  tasks.Add(client
+    .GetStringAsync("https://api.github.com"));
 }
 await Task.WhenAll(tasks);
 \end{lstlisting}
@@ -519,17 +520,6 @@ protected override void Dispose(bool disposing)
 \begin{frame}[fragile]
 \frametitle{Dispose HttpMessageInvoker}
 \begin{lstlisting}
-public void Dispose()
-{
-  this.Dispose(true);
-  GC.SuppressFinalize((object) this);
-}
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Dispose HttpMessageInvoker}
-\begin{lstlisting}
 protected virtual void Dispose(bool disposing)
 {
   if (!disposing || this._disposed)
@@ -794,7 +784,7 @@ using(var req = new HttpRequestMessage())
 \frametitle{Диспозить или нет?}
 \begin{itemize}
 	\item <1-> Зависит от $HttpContent$; 
-	\item <2-> Чаще всего это $StringContent$ $\Rightarrow$ можно не диспозить.
+	\item <2-> Чаще всего это $StringContent$ $\Rightarrow$ можно не диспозить$^*$.
 \end{itemize}
 \end{frame}
 
@@ -833,13 +823,13 @@ using(var resp = await client.GetAsync(...))
 \begin{itemize}
 	\item <1-> Для $GetAsync$ и $SendAsync$;
 	\item <2-> $HttpCompletionOption$: $ResponseContentRead$, $ResponseHeadersRead$;
-	\item <3-> Если $ResponseContentRead$, то данные сохраняются в $MemoryStream$ $\Rightarrow$ можно без диспоза;
+	\item <3-> Если $ResponseContentRead$, то данные сохраняются в $MemoryStream$ $\Rightarrow$ можно без диспоза$^*$;
 	\item <4-> Иначе стоит диспозить. 
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Всё-таки диспозить или нет?}
+\frametitle{$^*$Всё-таки диспозить или нет?}
 \begin{itemize}
 	\item <1-> Это внутрення реализация, которая может измениться;
 	\item <2-> Лучше всегда диспозить;
